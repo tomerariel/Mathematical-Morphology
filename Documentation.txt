@@ -1,0 +1,188 @@
+Documentation of morphological functions.
+
+Dependecies:
+	python 3.x
+	numpy
+
+
+Auxiliary functions:
+
+	morphology.reverse(img):
+			Converts a binary black-over-white image to a binary white-over-black image.
+		Parameters:
+			img: np.ndarray
+				The required binary image to convert.
+		Returns:
+			img: np.ndarray
+				The resulting reversed binary image.	
+
+	morphology.gray_conversion(img):
+		Converts a 3D np.ndarray representing a color image to a 2D np.ndarray which represents the same image in grayscale.
+		Parameters:
+			img: np.ndarray
+				The required array to convert.
+		Returns:
+			img: np.ndarray
+				The resulting grayscale image.
+
+	morphology.segment(img, th=None):
+		Converts a grayscale image (2D np.ndarray with values in range [0, 255]) to a binary (black and white) image using basic segmentation.
+		Parameters:
+			img: np.ndarray
+				The required array to convert.
+			th: int, [0, 255], optional
+				The deciding threshold between black and white pixels. All pixels [i, j] with intensity less than threshold will be converted to black (0).
+				All pixels [i, j] with intensity equal or greater than threshold will be converted to white (255). If no value is given, Mean value of image is chosen by default.
+		Returns:
+			img: np.ndarray 
+				The resulting binary image.
+
+	morphology.hist_thresh(img):
+		Iteratively computes an optimal global threshold based on the histogram of a grayscale image and converts it to a binary (black and white) image.
+		Parameters:
+			img: np.ndarray
+				The required array to convert.
+		Returns: 
+			img: np.ndarray 
+				The resulting binary image.
+
+	morphology.binarize(img, mode='hist', th=None):
+		Performs binarization of a grayscale image according to specified parameters.
+		Parameters:
+			img: np.ndarray
+				The required array to convert.
+			mode: str, optional
+				One of the following string values (if no value is given, 'hist' is used by default):
+					'hist'
+						Performs histogram-evaluated thresholding.
+					'seg'
+						Performs basic segmentation.
+		Returns: 
+			img: np.ndarray 
+				The resulting binary image.
+
+	morphology.fit(index):
+		Converts an index to 0 if it deviates from the range of comparison.
+		Parameters:
+			index: int
+				The index to be checked.
+		Returns:
+			index: int
+				The original index or 0.
+
+	morphology.find_range(img):
+		Some binary images are represented by matrices with values 0 and 1, while others are represented by matrices with values 0 and 255.
+		This function accepts 2D np.nadarray in either format and returns the same array with 0 and 255.
+		Parameters:
+			img: np.ndarray 
+ 				The binary image.
+		Returns:
+			img: np.ndarray 
+				The binary image in [0, 255] format.	
+
+	morphology.strel(shape='rect', dim=(3, 3), rad=3):
+		A function to generate a structuring element according to specific parameters.
+		Paramaters:
+			shape: str, optional
+				One of the following string values (if no value is given, 'rect' is used by default):
+					'rect'
+						Returns a rectangular structuring element.
+					'cross'
+						Returns a cross-shaped structuring element.
+					'diag
+						Returns a main-diagonal shaped structuring element.
+					'anti'
+						Returns an anti-diagonal structuring element.
+					'ellipse'
+						Returns an elliptical structuring element.
+					'disk'
+						Returns a disk-shaped structuring element.				
+			dim: tuple, optional
+				The dimensions of structuring element in case of rectangular shapes: rectangle or cross. (3, 3) is the default.
+			rad: int, optional
+				The radius of the shape in case of circular shapes: disk or ellipse. 3 is the default.
+		Returns:
+			strel: np.ndarray
+				The binary structuring element with required shape and size.
+
+
+Fundamental morphological functions:
+
+	morphology.erosion(img, strel=np.ones((3,3), dtype=np.uint8)):	
+		One of two fundamental operations in mathematical morphology (the other being dilation).
+		The function returns the erosion of a binary shape by a given structuring element. 
+		Parameters:
+			img: np.ndarray 
+				The binary image on which the erosion is performed.
+			strel: np.ndarray, optional
+				A binary shape (usually much smaller than the image) used to interact with the image. If no argument is passed, a 3x3 array of 1's is chosen by default.
+		Returns:
+			a: np.ndarray
+				The result of the image eroded by the structuring element.
+
+	morphology.dilation(img, strel=np.ones((3,3), dtype=np.uint8)):	
+		One of two fundamental operations in mathematical morphology (the other being erosion).
+		The function returns the dilation of a binary shape by a given structuring element. 
+		Parameters:
+			img: np.ndarray 
+				The binary image on which the dilation is performed.
+			strel: np.ndarray, optional
+				A binary shape (usually much smaller than the image) used to interact with the image. If no argument is passed, a 3x3 array of 1's is chosen by default.
+		Returns:
+			a: np.ndarray
+				The result of the image dilated by the structuring element.
+
+
+Compound morphological functions:
+		
+	morphology.opening(img, strel=np.ones((3,3), dtype=np.uint8)):	
+		A compound morphological operation which consists of erosion followed by dilation.
+		The function returns the dilation of the erosion of a binary shape by a given structuring element. 
+		Parameters:
+			img: np.ndarray 
+				The binary image on which the opening is performed.
+			strel: np.ndarray, optional
+				A binary shape (usually much smaller than the image) used to interact with the image. If no argument is passed, a 3x3 array of 1's is chosen by default.
+		Returns:
+			a: np.ndarray
+				The result of the image opened by the structuring element.
+
+	morphology.closing(img, strel=np.ones((3,3), dtype=np.uint8)):	
+		A compound morphological operation which consists of dilation followed by erosion.
+		The function returns the erosion of the dilation of a binary shape by a given structuring element. 
+		Parameters:
+			img: np.ndarray 
+				The binary image on which the closing is performed.
+			strel: np.ndarray, optional
+				A binary shape (usually much smaller than the image) used to interact with the image. If no argument is passed, a 3x3 array of 1's is chosen by default.
+		Returns:
+			a: np.ndarray
+				The result of the image closed by the structuring element.
+			
+	morphology.morph(img, oper=None, iterations=1, strel=np.ones((3, 3), dtype=np.uint8), bin=0):
+		This function performs a specific morphological operation (fundamental or compound) for a defined number of iterations.
+		Parameters:
+			img: np.ndarray 
+				The binary image on which the erosion is performed.
+			op: str, optional
+				One of the following string values (if no value is given, exception is raised):
+					'er'
+						Performs erosion.
+					'di'
+						Performs dilation
+					'cl'
+						Performs closing.
+					'op'
+						Performs opening.
+			iterations: int, optional
+				The number of iterations the specified operation will be performed.
+			strel: np.ndarray, optional
+				A binary shape (usually much smaller than the image) used to interact with the image. If no argument is passed, a 3x3 array of 1's is chosen by default.
+			bin: int, optional
+				Additional flag for binary conversion. If a non-zero value is passed binarization will be performed on the image before the morphological operation.
+		Returns:
+			a: np.ndarray
+				The result of the image after the specified operation has been performed the required amount of iterations using given structuring element.
+	
+	
+
