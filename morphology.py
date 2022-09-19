@@ -55,24 +55,10 @@ def erosion(img, strel=np.ones((3, 3))):
             # Step II - Find points (x0, y0), (x1, y1) such that the shape of
             # structuring element [x0:x1, y0:y1] will be equal to the shape of intersection:
 
-            if orig[0] - i > 0:
-                x0 = orig[0] - i
-            else:
-                x0 = 0
-            if i + (x - orig[0]) > dim[0]:
-                x1 = (dim[0] + orig[0]) - (i + 1)
-            else:
-                x1 = x - 1
-
-            if orig[1] - j > 0:
-                y0 = orig[1] - j
-            else:
-                y0 = 0
-            if j + (y - orig[1]) > dim[1]:
-                y1 = (dim[1] + orig[1]) - (j + 1)
-            else:
-                y1 = y - 1
-
+            x0 = max(orig[0] - i, 0)
+            x1 = (dim[0] + orig[0]) - (i + 1) if i + (x - orig[0]) > dim[0] else x - 1
+            y0 = max(orig[1] - j, 0)
+            y1 = (dim[1] + orig[1]) - (j + 1) if j + (y - orig[1]) > dim[1] else y - 1
             # Step III - Compute match:
 
             match = np.logical_and(inters, strel[x0:x1 + 1, y0:y1 + 1])
@@ -108,24 +94,10 @@ def dilation(img, strel=np.ones((3, 3))):
             # Step II - find points (x0, y0), (x1, y1) such that the shape of
             # structuring element [x0:x1, y0:y1] will be equal to the shape of intersection:
 
-            if orig[0] - i > 0:
-                x0 = orig[0] - i
-            else:
-                x0 = 0
-            if i + (x - orig[0]) > dim[0]:
-                x1 = (dim[0] + orig[0]) - (i + 1)
-            else:
-                x1 = x - 1
-
-            if orig[1] - j > 0:
-                y0 = orig[1] - j
-            else:
-                y0 = 0
-            if j + (y - orig[1]) > dim[1]:
-                y1 = (dim[1] + orig[1]) - (j + 1)
-            else:
-                y1 = y - 1
-
+            x0 = max(orig[0] - i, 0)
+            x1 = (dim[0] + orig[0]) - (i + 1) if i + (x - orig[0]) > dim[0] else x - 1
+            y0 = max(orig[1] - j, 0)
+            y1 = (dim[1] + orig[1]) - (j + 1) if j + (y - orig[1]) > dim[1] else y - 1
             # Step III - Compute match:
 
             match = np.logical_and(inters, strel[x0:x1 + 1, y0:y1 + 1])
@@ -161,15 +133,12 @@ def reverse(img):
 
 
 def gray_conversion(img):
-    # Auxiliary function to convert color images to grayscale.
-
     if len(img.shape) == 2:
         return img
-    else:
-        gray_img = np.asarray(img, dtype=np.float64)
-        gray_img = 0.07 * img[:, :, 2] + 0.72 * img[:, :, 1] + 0.21 * img[:, :, 0]
-        gray_img = np.reshape(gray_img, (gray_img.shape[0], gray_img.shape[1]))
-        return gray_img.astype(np.float64)
+    gray_img = np.asarray(img, dtype=np.float64)
+    gray_img = 0.07 * img[:, :, 2] + 0.72 * img[:, :, 1] + 0.21 * img[:, :, 0]
+    gray_img = np.reshape(gray_img, (gray_img.shape[0], gray_img.shape[1]))
+    return gray_img.astype(np.float64)
 
 
 def segment(img, th=None):
@@ -213,10 +182,7 @@ def binarize(img, mode='hist', th=None):
 def fit(index):
     # Auxiliary function to compute intersection of a structuring element and a binary image.
 
-    if index < 0:
-        return 0
-    else:
-        return index
+    return max(index, 0)
 
 
 def find_range(img):
@@ -287,8 +253,8 @@ def erosion_ver2(img, strel=np.ones((3, 3))):
     x, y = strel.shape[0], strel.shape[1]
     a = np.zeros(dim)
 
-    for i in range(orig[0], dim[0] - orig[0], 1):
-        for j in range(orig[1], dim[1]-orig[1], 1):
+    for i in range(orig[0], dim[0] - orig[0]):
+        for j in range(orig[1], dim[1]-orig[1]):
             intersection = img[i - orig[0]:i - orig[0] + x, j - orig[1]:j - orig[0] + y]
             intersection_sum = intersection + strel
             overlap = intersection[intersection_sum == 2]
@@ -314,8 +280,8 @@ def dilation_ver2(img, strel=np.ones((3, 3))):
     x, y = strel.shape[0], strel.shape[1]
     a = np.zeros(dim)
 
-    for i in range(orig[0], dim[0] - orig[0], 1):
-        for j in range(orig[1], dim[1] - orig[1], 1):
+    for i in range(orig[0], dim[0] - orig[0]):
+        for j in range(orig[1], dim[1] - orig[1]):
             intersection = img[i - orig[0]:i - orig[0] + x, j - orig[1]:j - orig[0] + y]
             intersection_sum = intersection + strel
             overlap = intersection[intersection_sum == 2]
